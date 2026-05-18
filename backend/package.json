@@ -1,0 +1,36 @@
+{
+  "name": "p2d-backend",
+  "version": "1.0.0",
+  "description": "P2D Backend - AWS Lambda functions",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.0.0",
+    "@aws-sdk/lib-dynamodb": "^3.0.0",
+    "@aws-sdk/client-s3": "^3.0.0",
+    "@aws-sdk/client-sqs": "^3.0.0",
+    "@aws-sdk/client-ses": "^3.0.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.0.0",
+    "@aws-sdk/client-secrets-manager": "^3.0.0",
+    "@supabase/supabase-js": "^2.0.0",
+    "@upstash/redis": "^1.0.0",
+    "razorpay": "^2.0.0",
+    "zod": "^3.0.0",
+    "jsonwebtoken": "^9.0.0",
+    "qrcode": "^1.0.0",
+    "bcrypt": "^5.0.0",
+    "axios": "^1.0.0",
+    "@sentry/node": "^7.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0",
+    "@types/aws-lambda": "^8.10.0",
+    "jest": "^29.0.0",
+    "ts-jest": "^29.0.0",
+    "serverless": "^3.0.0"
+  }
+}
