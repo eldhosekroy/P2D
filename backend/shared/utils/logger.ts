@@ -1,4 +1,4 @@
-import { Sentry } from '@sentry/node';
+import * as Sentry from '@sentry/node';
 
 // Initialize Sentry only if DSN is provided
 if (process.env.SENTRY_DSN) {

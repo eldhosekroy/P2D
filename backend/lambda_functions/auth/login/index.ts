@@ -1,84 +1,59 @@
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import { z } from 'zod';
-import { CognitoIdentityProviderClient, InitiateAuthCommand, RespondToAuthChallengeCommand } from '@aws-sdk/client-cognito-identity-provider';
-import { logger } from '../../shared/utils/logger';
-import { ApiResponse } from '../../shared/utils/api_response';
-import { supabase } from '../../shared/services/supabase_client';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import { LocalStorage } from '../../../shared/services/local_storage';
+import { logger } from '../../../shared/utils/logger';
+import { ApiResponse } from '../../../shared/utils/api_response';
 
 const loginSchema = z.object({
-  username: z.string().min(1), // Can be email or phone
-  password: z.string().min(8),
+  username: z.string(), // Can be email or phone
+  password: z.string(),
 });
 
-const cognitoClient = new CognitoIdentityProviderClient({ region: process.env.AWS_REGION });
+const JWT_SECRET = process.env.JWT_SECRET || 'local_secret_key_for_development';
 
 export const handler: APIGatewayProxyHandler = async (event) => {
   try {
     const body = JSON.parse(event.body || '{}');
     const { username, password } = loginSchema.parse(body);
 
-    let authResponse;
-    try {
-      const initiateAuthCommand = new InitiateAuthCommand({
-        ClientId: process.env.AWS_COGNITO_CLIENT_ID || '',
-        AuthFlow: 'USER_PASSWORD_AUTH',
-        AuthParameters: {
-          USERNAME: username,
-          PASSWORD: password,
-        },
-      });
-      authResponse = await cognitoClient.send(initiateAuthCommand);
-    } catch (error: any) {
-      if (error.name === 'UserNotConfirmedException') {
-        return ApiResponse.unauthorized('User not confirmed. Please verify your account.');
-      } else if (error.name === 'NotAuthorizedException' || error.name === 'UserNotFoundException') {
-        return ApiResponse.unauthorized('Invalid username or password.');
-      } else {
-        logger.error('Cognito InitiateAuth error', error);
-        return ApiResponse.internalServerError('Authentication failed.');
-      }
+    // 1. Find user by email or phone
+    const user = await LocalStorage.findOne('users.json', u => u.email === username || u.phone === username);
+    if (!user) {
+      return ApiResponse.unauthorized('Invalid username or password.');
     }
 
-    // Handle MFA or other challenges if necessary (not fully implemented in this example)
-    if (authResponse.ChallengeName) {
-      // For simplicity, we are not handling MFA challenges here. In a real app,
-      // you would need to implement a separate flow for each challenge type.
-      logger.warn('Cognito challenge encountered', { challenge: authResponse.ChallengeName });
-      return ApiResponse.forbidden('MFA or other challenge required. Please use the appropriate flow.');
+    // 2. Verify password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return ApiResponse.unauthorized('Invalid username or password.');
     }
 
-    const accessToken = authResponse.AuthenticationResult?.AccessToken;
-    const refreshToken = authResponse.AuthenticationResult?.RefreshToken;
-    const idToken = authResponse.AuthenticationResult?.IdToken;
+    // 3. Generate local JWT
+    const token = jwt.sign(
+      { userId: user.id, role: user.role, name: user.name },
+      JWT_SECRET,
+      { expiresIn: '24h' }
+    );
 
-    if (!accessToken || !idToken) {
-      return ApiResponse.unauthorized('Failed to get authentication tokens.');
-    }
-
-    // Decode ID token to get user details and role
-    const decodedIdToken = JSON.parse(Buffer.from(idToken.split('.')[1], 'base64').toString());
-    const userId = decodedIdToken.sub;
-    const userRole = decodedIdToken['custom:role'] || 'customer';
-
-    // Update last_login in Supabase (optional, for tracking)
-    await supabase.from('users').update({ last_login_at: new Date().toISOString() }).eq('cognito_sub', userId);
-
-    logger.info('User logged in successfully', { userId, userRole });
+    logger.info('User logged in locally', { userId: user.id });
 
     return ApiResponse.success({
-      userId,
-      role: userRole,
-      accessToken,
-      refreshToken,
-      idToken,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+      },
+      token,
     });
   } catch (error: any) {
     logger.error('Login error', error);
-
     if (error instanceof z.ZodError) {
       return ApiResponse.badRequest('Validation Error', error.errors);
     }
-
-    return ApiResponse.internalServerError('Failed to login user.');
+    return ApiResponse.internalServerError('Failed to login.');
   }
 };

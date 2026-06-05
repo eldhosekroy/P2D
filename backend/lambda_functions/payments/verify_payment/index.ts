@@ -1,11 +1,11 @@
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import { z } from 'zod';
 import crypto from 'crypto';
-import { supabase } from '../../shared/services/supabase_client';
-import { logger } from '../../shared/utils/logger';
-import { ApiResponse } from '../../shared/utils/api_response';
-import { authMiddleware } from '../../shared/middleware/auth_middleware';
-import { rbacMiddleware } from '../../shared/middleware/rbac_middleware';
+import { supabase } from '../../../shared/services/supabase_client';
+import { logger } from '../../../shared/utils/logger';
+import { ApiResponse } from '../../../shared/utils/api_response';
+import { authMiddleware } from '../../../shared/middleware/auth_middleware';
+import { rbacMiddleware } from '../../../shared/middleware/rbac_middleware';
 
 const verifyPaymentSchema = z.object({
   razorpay_order_id: z.string(),

@@ -1,11 +1,11 @@
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import { z } from 'zod';
-import { supabase } from '../../shared/services/supabase_client';
-import { logger } from '../../shared/utils/logger';
-import { ApiResponse } from '../../shared/utils/api_response';
-import { authMiddleware } from '../../shared/middleware/auth_middleware';
-import { rbacMiddleware } from '../../shared/middleware/rbac_middleware';
-// import { sqs } from '../../shared/services/sqs_client'; // To push notifications to driver/customer via SQS
+import { supabase } from '../../../shared/services/supabase_client';
+import { logger } from '../../../shared/utils/logger';
+import { ApiResponse } from '../../../shared/utils/api_response';
+import { authMiddleware } from '../../../shared/middleware/auth_middleware';
+import { rbacMiddleware } from '../../../shared/middleware/rbac_middleware';
+// import { sqs } from '../../../shared/services/sqs_client'; // To push notifications to driver/customer via SQS
 
 const assignDriverSchema = z.object({
   orderId: z.string().uuid(),

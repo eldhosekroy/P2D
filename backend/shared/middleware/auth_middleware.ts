@@ -1,8 +1,8 @@
-import { APIGatewayProxyHandler } from 'aws-lambda';
+import { APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
 import { ApiResponse } from '../utils/api_response';
 import { logger } from '../utils/logger';
 
-export const authMiddleware = (handler: APIGatewayProxyHandler): APIGatewayProxyHandler => async (event, context, callback) => {
+export const authMiddleware = (handler: APIGatewayProxyHandler): APIGatewayProxyHandler => (async (event, context, callback) => {
   try {
     // Placeholder for JWT verification logic
     // Extract Bearer token from Authorization header
@@ -12,9 +12,9 @@ export const authMiddleware = (handler: APIGatewayProxyHandler): APIGatewayProxy
     // For now, simply pass through
     // event.requestContext.authorizer = { userId: 'mock-user-id', role: 'customer' };
     logger.info('Auth middleware placeholder executed');
-    return handler(event, context, callback);
+    return await handler(event, context, callback) as APIGatewayProxyResult;
   } catch (error: any) {
     logger.error('Auth middleware error', error);
     return ApiResponse.unauthorized('Authentication failed.');
   }
-};
+}) as APIGatewayProxyHandler;

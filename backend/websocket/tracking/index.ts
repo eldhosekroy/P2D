@@ -1,5 +1,5 @@
 import { APIGatewayProxyHandler } from 'aws-lambda';
-import { ApiGatewayManagementApiClient, PostToConnectionCommand } from '@aws-sdk/client-apigateway-management-api';
+import { ApiGatewayManagementApiClient, PostToConnectionCommand } from '@aws-sdk/client-apigatewaymanagementapi';
 import { ScanCommand } from '@aws-sdk/lib-dynamodb';
 import { dynamoDB } from '../../shared/services/dynamodb_client';
 import { logger } from '../../shared/utils/logger';

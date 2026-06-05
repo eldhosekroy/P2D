@@ -1,48 +1,21 @@
 import { APIGatewayProxyHandler } from 'aws-lambda';
-import { supabase } from '../../shared/services/supabase_client';
-import { logger } from '../../shared/utils/logger';
-import { ApiResponse } from '../../shared/utils/api_response';
-import { authMiddleware } from '../../shared/middleware/auth_middleware';
-import { rbacMiddleware } from '../../shared/middleware/rbac_middleware';
+import { LocalStorage } from '../../../shared/services/local_storage';
+import { ApiResponse } from '../../../shared/utils/api_response';
 
-const getOrderHandler: APIGatewayProxyHandler = async (event) => {
+export const handler: APIGatewayProxyHandler = async (event) => {
   try {
-    const userId = event.requestContext.authorizer?.claims?.sub;
-    const userRole = event.requestContext.authorizer?.claims?.['custom:role'] || 'customer';
-    const orderId = event.pathParameters?.orderId;
+    const orderId = event.pathParameters?.id;
 
-    if (!orderId) {
-      return ApiResponse.badRequest('Order ID is required.');
+    if (orderId) {
+      const order = await LocalStorage.findOne('orders.json', o => o.id === orderId);
+      if (!order) return ApiResponse.notFound('Order not found.');
+      return ApiResponse.success(order);
     }
 
-    // Fetch order from Supabase
-    const { data: order, error } = await supabase
-      .from('orders')
-      .select('*, customer:customer_id(name, phone), driver:driver_id(name, phone, drivers(vehicle_type, vehicle_number))')
-      .eq('id', orderId)
-      .single();
-
-    if (error || !order) {
-      logger.warn('Order not found', { orderId, userId, error });
-      return ApiResponse.notFound('Order not found.');
-    }
-
-    // Authorization: Customer can only view their own orders, Driver can view their assigned orders or available orders.
-    const isCustomer = userRole === 'customer' && order.customer_id === userId;
-    const isDriver = userRole === 'driver' && (order.driver_id === userId || order.status === 'pending');
-    const isAdmin = userRole === 'admin';
-
-    if (!isCustomer && !isDriver && !isAdmin) {
-      return ApiResponse.forbidden('You do not have permission to view this order.');
-    }
-
-    logger.info('Order retrieved', { orderId, userId });
-
-    return ApiResponse.success(order);
+    // If no ID, return all orders (in a real app, filtered by userId)
+    const orders = await LocalStorage.read('orders.json');
+    return ApiResponse.success(orders);
   } catch (error: any) {
-    logger.error('Get order error', error);
-    return ApiResponse.internalServerError('Failed to retrieve order.');
+    return ApiResponse.internalServerError('Failed to fetch orders.');
   }
 };
-
-export const handler = authMiddleware(rbacMiddleware(['customer', 'driver', 'admin'])(getOrderHandler));

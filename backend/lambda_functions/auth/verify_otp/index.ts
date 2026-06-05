@@ -1,8 +1,8 @@
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import { z } from 'zod';
 import { CognitoIdentityProviderClient, ConfirmSignUpCommand, ConfirmForgotPasswordCommand } from '@aws-sdk/client-cognito-identity-provider';
-import { logger } from '../../shared/utils/logger';
-import { ApiResponse } from '../../shared/utils/api_response';
+import { logger } from '../../../shared/utils/logger';
+import { ApiResponse } from '../../../shared/utils/api_response';
 
 const verifyOtpSchema = z.object({
   username: z.string().min(1), // Email or phone

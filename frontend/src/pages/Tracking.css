@@ -1,0 +1,144 @@
+.tracking-container {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+.tracking-content {
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.back-link {
+  background: none;
+  border: none;
+  color: #007bff;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+  padding: 0;
+}
+
+.tracking-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
+}
+
+.tracking-header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.status-timeline {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 3rem;
+  position: relative;
+  padding: 0 1rem;
+}
+
+.status-timeline::before {
+  content: '';
+  position: absolute;
+  top: 20px;
+  left: 2rem;
+  right: 2rem;
+  height: 2px;
+  background-color: #ddd;
+  z-index: 1;
+}
+
+.timeline-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  z-index: 2;
+  flex: 1;
+}
+
+.timeline-icon {
+  width: 40px;
+  height: 40px;
+  background-color: white;
+  border: 2px solid #ddd;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #999;
+  transition: all 0.3s;
+}
+
+.timeline-label {
+  font-size: 0.75rem;
+  color: #999;
+  font-weight: 500;
+  text-align: center;
+}
+
+.timeline-item.active .timeline-icon {
+  border-color: #007bff;
+  color: #007bff;
+  background-color: #f0f7ff;
+}
+
+.timeline-item.active .timeline-label {
+  color: #007bff;
+}
+
+.tracking-details {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  padding: 2rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.details-section h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.5rem;
+}
+
+.address-item {
+  margin-bottom: 1rem;
+}
+
+.address-item label {
+  font-size: 0.75rem;
+  color: #999;
+  display: block;
+}
+
+.address-item p {
+  margin: 0.25rem 0 0 0;
+  font-size: 0.875rem;
+  color: #444;
+}
+
+.driver-info {
+  grid-column: span 2;
+  background-color: #f0f7ff;
+  padding: 1rem;
+  border-radius: 4px;
+}
+
+@media (max-width: 600px) {
+  .tracking-details {
+    grid-template-columns: 1fr;
+  }
+  .driver-info {
+    grid-column: span 1;
+  }
+}

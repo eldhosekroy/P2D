@@ -2,12 +2,12 @@ import { APIGatewayProxyHandler } from 'aws-lambda';
 import { z } from 'zod';
 import crypto from 'crypto';
 import { GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
-import { supabase } from '../../shared/services/supabase_client';
-import { logger } from '../../shared/utils/logger';
-import { ApiResponse } from '../../shared/utils/api_response';
-import { secretsManager } from '../../shared/services/secrets_client';
-import { authMiddleware } from '../../shared/middleware/auth_middleware';
-import { rbacMiddleware } from '../../shared/middleware/rbac_middleware';
+import { supabase } from '../../../shared/services/supabase_client';
+import { logger } from '../../../shared/utils/logger';
+import { ApiResponse } from '../../../shared/utils/api_response';
+import { secretsManager } from '../../../shared/services/secrets_client';
+import { authMiddleware } from '../../../shared/middleware/auth_middleware';
+import { rbacMiddleware } from '../../../shared/middleware/rbac_middleware';
 
 const generateQrSchema = z.object({
   orderId: z.string().uuid(),
@@ -53,7 +53,7 @@ const generateQrHandler: APIGatewayProxyHandler = async (event) => {
 
     if (existingToken) {
       try {
-        const [payloadBase64, signature] = existingToken.split('.');
+        const [payloadBase64] = existingToken.split('.');
         const payload = JSON.parse(Buffer.from(payloadBase64, 'base64').toString());
         if (payload.exp > Date.now()) { // Check if token is not expired
           logger.info('Using existing valid QR token', { orderId, type });

@@ -1,8 +1,8 @@
-import { APIGatewayProxyHandler } from 'aws-lambda';
+import { APIGatewayProxyHandler, APIGatewayProxyResult } from 'aws-lambda';
 import { ApiResponse } from '../utils/api_response';
 import { logger } from '../utils/logger';
 
-export const rbacMiddleware = (allowedRoles: string[]) => (handler: APIGatewayProxyHandler): APIGatewayProxyHandler => async (event, context, callback) => {
+export const rbacMiddleware = (allowedRoles: string[]) => (handler: APIGatewayProxyHandler): APIGatewayProxyHandler => (async (event, context, callback) => {
   try {
     // Placeholder for RBAC logic
     // Assume event.requestContext.authorizer has 'role' property from authMiddleware
@@ -14,9 +14,9 @@ export const rbacMiddleware = (allowedRoles: string[]) => (handler: APIGatewayPr
     // }
 
     logger.info('RBAC middleware placeholder executed', { allowedRoles });
-    return handler(event, context, callback);
+    return await handler(event, context, callback) as APIGatewayProxyResult;
   } catch (error: any) {
     logger.error('RBAC middleware error', error);
     return ApiResponse.internalServerError('RBAC check failed.');
   }
-};
+}) as APIGatewayProxyHandler;

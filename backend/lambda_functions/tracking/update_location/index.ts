@@ -1,12 +1,12 @@
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import { z } from 'zod';
 import { UpdateCommand, GetCommand, PutCommand } from '@aws-sdk/lib-dynamodb';
-import { dynamoDB } from '../../shared/services/dynamodb_client';
-import { logger } from '../../shared/utils/logger';
-import { ApiResponse } from '../../shared/utils/api_response';
-import { validateGpsUpdate } from '../../shared/utils/gps_validator';
-import { authMiddleware } from '../../shared/middleware/auth_middleware';
-import { rbacMiddleware } from '../../shared/middleware/rbac_middleware';
+import { dynamoDB } from '../../../shared/services/dynamodb_client';
+import { logger } from '../../../shared/utils/logger';
+import { ApiResponse } from '../../../shared/utils/api_response';
+import { validateGpsUpdate } from '../../../shared/utils/gps_validator';
+import { authMiddleware } from '../../../shared/middleware/auth_middleware';
+import { rbacMiddleware } from '../../../shared/middleware/rbac_middleware';
 // import { sendWebSocketMessage } from '../../websocket/tracking/index'; // To be implemented for real-time broadcast
 
 const updateLocationSchema = z.object({

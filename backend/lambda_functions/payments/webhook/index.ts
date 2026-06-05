@@ -1,11 +1,11 @@
 import { APIGatewayProxyHandler } from 'aws-lambda';
 import { z } from 'zod';
 import crypto from 'crypto';
-import { supabase } from '../../shared/services/supabase_client';
-import { logger } from '../../shared/utils/logger';
-import { ApiResponse } from '../../shared/utils/api_response';
-// import { sendPushNotification } from '../../shared/services/fcm_client'; // To send notifications
-// import { sendEmail } from '../../shared/services/ses_client'; // To send payment receipts
+import { supabase } from '../../../shared/services/supabase_client';
+import { logger } from '../../../shared/utils/logger';
+import { ApiResponse } from '../../../shared/utils/api_response';
+// import { sendPushNotification } from '../../../shared/services/fcm_client'; // To send notifications
+// import { sendEmail } from '../../../shared/services/ses_client'; // To send payment receipts
 
 const webhookEventSchema = z.object({
   entity: z.string(),
